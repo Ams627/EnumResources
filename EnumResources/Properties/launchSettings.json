@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "EnumResources": {
+      "commandName": "Project",
+      "commandLineArgs": "\"C:\\Program Files\\WinMerge\\ShellExtensionX64.dll\""
+    }
+  }
+}
