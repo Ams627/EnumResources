@@ -103,6 +103,7 @@ namespace EnumResources
                 var resourceName  = $"{ResourceTypeHelper.GetResourceTypename((ResourceTypeHelper.ResourceTypes)type)}-{name}";
                 outputFilename = $"{resourceName}.bin";
             }
+
             var handle = FindResource(hModule, $"#{name}", type);
             var resource = LoadResource(hModule, handle);
             var mem = LockResource(resource);
@@ -127,40 +128,52 @@ namespace EnumResources
                         Console.Error.WriteLine($"Cannot read from file {filename}.");
                     }
 
-                    var resourceTypes = new List<object>();
-                    var mem = GCHandle.Alloc(resourceTypes);
-                    EnumResourceTypes(lib, EnumResourceTypeProc, (IntPtr)mem);
-                    mem.Free();
-                    
-                    foreach (var r in resourceTypes)
+                    var helper = new Win32ResourceHelper();
+                    var types = helper.GetResourceTypes(lib).ToList();
+                    foreach (var type in types)
                     {
-                        var toPrint = r is int i ? ResourceTypeHelper.GetResourceTypenameForPrinting(i) : r;
-                        Console.WriteLine($"{toPrint}");
-                    }
-                    foreach (var resourceType in resourceTypes)
-                    {
-                        IntPtr type = IntPtr.Zero;
-
-                        if (resourceType is string str)
+                        var names = helper.GetResourceNames(lib, type).ToList();
+                        foreach (var name in names)
                         {
-                            type = Marshal.StringToHGlobalAnsi(str);
-                        }
-                        else if (resourceType is int i)
-                        {
-                            type = (IntPtr)i;
-                        }
-
-                        var res = EnumResourceNames(lib, type, EnumResourceNamesProc, IntPtr.Zero);
-                        if (!res)
-                        {
-                            var error = GetLastError();
-                        }
-                        else
-                        {
-                            Console.WriteLine();
-                        }
+                            var languages = helper.GetResourceLanguages(lib, type, name).ToList();
+                        }   
                     }
                 }
+
+                //    var resourceTypes = new List<object>();
+                //    var mem = GCHandle.Alloc(resourceTypes);
+                //    EnumResourceTypes(lib, EnumResourceTypeProc, (IntPtr)mem);
+                //    mem.Free();
+                    
+                //    foreach (var r in resourceTypes)
+                //    {
+                //        var toPrint = r is int i ? ResourceTypeHelper.GetResourceTypenameForPrinting(i) : r;
+                //        Console.WriteLine($"{toPrint}");
+                //    }
+                //    foreach (var resourceType in resourceTypes)
+                //    {
+                //        IntPtr type = IntPtr.Zero;
+
+                //        if (resourceType is string str)
+                //        {
+                //            type = Marshal.StringToHGlobalAnsi(str);
+                //        }
+                //        else if (resourceType is int i)
+                //        {
+                //            type = (IntPtr)i;
+                //        }
+
+                //        var res = EnumResourceNames(lib, type, EnumResourceNamesProc, IntPtr.Zero);
+                //        if (!res)
+                //        {
+                //            var error = GetLastError();
+                //        }
+                //        else
+                //        {
+                //            Console.WriteLine();
+                //        }
+                //    }
+                // }
             }
             catch (Exception ex)
             {
