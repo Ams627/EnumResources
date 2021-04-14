@@ -1,0 +1,3 @@
+= EnumResources test data
+
+The file in this directory is from winmerge.
